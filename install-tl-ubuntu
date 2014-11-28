@@ -454,9 +454,22 @@ if [ -z "${TLREPO:-}" -a -z "${ISO_FILE}" ]; then
     # TODO could use a checksum to make sure that even though wget exited without error the file is not corrupt.
 
     grep "^0" "${LOG_DIR}/mirrorWgets.log" | sort -n -k2 > "${LOG_DIR}/mirrorCandidates.log"
-    TLREPO=$( sed 's/.*wget --quiet //' "${LOG_DIR}/mirrorCandidates.log" | sed 's#'/${testPath}'##' | head -n 1 )
+    TLREPO_SORTED=$( sed 's/.*wget --quiet //' "${LOG_DIR}/mirrorCandidates.log" | sed 's#'/${testPath}'##' )
+    TLREPO=$( echo "${TLREPO_SORTED}" | head -n 1)
     if [ -n "${TLREPO}" ]; then
-      echo "${ECHOPREFIX}the fastest repo is: ${TLREPO}"
+      TLREPO=$( echo "${TLREPO_SORTED}" | head -n 1)
+      TLREPO_SECOND=$( echo "${TLREPO_SORTED}" | head -n 2 | tail -n 1)
+      md1="$(wget -O - first --quiet "${TLREPO}/${testPath}" | md5sum)"
+      md2="$(wget -O second --quiet "${TLREPO_SECOND}/${testPath}" | md5sum)"
+      if [ "${md1}" = "${md2}" ]; then
+        echo "${ECHOPREFIX}the fastest repo is: ${TLREPO}"
+      else
+        # assume that the fastest is more likely to be corrupted than the second fastest
+        # TODO or choose the one with the largest file size download.
+        echo "${ECHOPREFIX}the following repo might be corrupted: ${TLREPO}"
+        TLREPO="${TLREPO_SECOND}"
+        echo "${ECHOPREFIX}using the second fastest repo: ${TLREPO}"
+      fi
     else
       echo "${ECHOPREFIX}trying automatic detection with a longer timeout and smaller file..."
       if [ "${PRETEST}" = "0" ]; then
