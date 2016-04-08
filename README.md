@@ -1,19 +1,24 @@
-# install-tl-ubuntu
+# install-tl-ubuntu (minimized customization for Japanese students and researchers)
+https://github.com/scottkosty/install-tl-ubuntu の`example.profile`を日本語対応にさせ、大多数の学生・研究者には不要と思われるパッケージを削ったバージョンです。TeXWorksも削っています。(TeXStudio・LyXなどをお使いください)
 
 ## Usage
 
-```s
-sudo ./install-tl-ubuntu [OPTIONS]
+```sh
+sudo ./install-tl-ubuntu -p example.profile [OTHER OPTIONS]
+```
+
+OR
+
+```sh
+cp example.profile mysetting.profile
+# edit mysetting.profile
+sudo ./install-tl-ubuntu -p mysetting.profile [OTHER OPTIONS]
 ```
 
 ## Quick download
 
-I recommend using `git clone` but I've learned that many Github users don't have
-Git. In these cases, you can download directly as follows:
-
-```s
-wget https://github.com/scottkosty/install-tl-ubuntu/raw/master/install-tl-ubuntu && chmod +x ./install-tl-ubuntu
-```
+`git clone` or `svn checkout` this repository, or download the .zip archive of this repository and unzip it.
+(このリポジトリを`git clone`・`svn checkout`で同期するか、zipアーカイブをダウンロード・解凍してください)
 
 ## Features
 
@@ -36,7 +41,7 @@ wget https://github.com/scottkosty/install-tl-ubuntu/raw/master/install-tl-ubunt
 - optionally installs TeX Live pretest instead, when it is available (--pretest)
 
 For more details, see
-```s
+```sh
 ./install-tl-ubuntu --help
 ```
 
