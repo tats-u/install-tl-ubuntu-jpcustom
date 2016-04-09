@@ -826,6 +826,10 @@ fi
 echo "${ECHOPREFIX}running texhash..."
 texhash >&3 2>&1 && echo "${ECHOPREFIX}texhash was successful." || { echo "${WARNINGPREFIX}texhash exited with error." >&2; MAINRET=1; }
 
+# By default, Japanese fonts are not embedded in PDFs with (u)p(La)TeX
+echo "${ECHOPREFIX}setting for embedding Japanese fonts..."
+kanji-config-updmap-sys auto || { echo "${WARNINGPREFIX}kanji-config-updmap-sys exited with error." >&2; MAINRET = 1; }
+
 if [ "${MAINRET}" = "0" ]; then
     echo "${ECHOPREFIX}`date`: Finished (all successful)."
 else
