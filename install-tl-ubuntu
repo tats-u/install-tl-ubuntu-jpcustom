@@ -440,13 +440,12 @@ if [ -z "${TLREPO:-}" -a -z "${ISO_FILE}" ]; then
     fi
 
     # We skip ftp connections.
-    # We only try every third server. The servers are listed in geographic
-    # order so this should pick up a little of everything.
+    # We try servers ONLY IN JAPAN.(except for pretest versions)
     if [ "${PRETEST}" = "0" ]; then
-      wget --quiet -O - "http://ctan.org/mirrors" \
-        | grep -o "http.*>http<" \
-        | sed -n 1~3p \
-        | sed 's/">http<//' > "candidates.txt"
+        wget -q https://texwiki.texjp.org/?CTAN -O - \
+        | sed 1d \
+        | grep -o 'href="http://.*/CTAN/"' \
+        | grep -o "http://.*/CTAN/" > "candidates.txt"
     else
       wget --quiet -O - "https://www.tug.org/texlive/mirmon/" \
         | grep -oP "HREF=\"http.*pretest/" \
