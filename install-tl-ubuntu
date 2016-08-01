@@ -8,6 +8,7 @@
 
 
 # Copyright 2013-2016, Scott Kostyshak
+#                2016, Tats.U.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -438,13 +439,12 @@ if [ -z "${TLREPO:-}" -a -z "${ISO_FILE}" ]; then
     fi
 
     # We skip ftp connections.
-    # We only try every third server. The servers are listed in geographic
-    # order so this should pick up a little of everything.
+    # We try servers ONLY IN JAPAN.(except for pretest versions)
     if [ "${PRETEST}" = "0" ]; then
-      wget --quiet -O - "http://ctan.org/mirrors" \
-        | grep -o "http.*>http<" \
-        | sed -n 1~3p \
-        | sed 's/">http<//' > "candidates.txt"
+        wget -q https://texwiki.texjp.org/?CTAN -O - \
+        | sed 1d \
+        | grep -o 'href="http://.*/CTAN/"' \
+        | grep -o "http://.*/CTAN/" > "candidates.txt"
     else
       wget --quiet -O - "https://www.tug.org/texlive/mirmon/" \
         | grep -oP "HREF=\"http.*pretest/" \
@@ -823,6 +823,10 @@ fi
 
 echo "${ECHOPREFIX}running texhash..."
 texhash >&3 2>&1 && echo "${ECHOPREFIX}texhash was successful." || { echo "${WARNINGPREFIX}texhash exited with error." >&2; MAINRET=1; }
+
+# By default, Japanese fonts are not embedded in PDFs with (u)p(La)TeX
+echo "${ECHOPREFIX}setting for embedding Japanese fonts..."
+kanji-config-updmap-sys auto || { echo "${WARNINGPREFIX}kanji-config-updmap-sys exited with error." >&2; MAINRET = 1; }
 
 if [ "${MAINRET}" = "0" ]; then
     echo "${ECHOPREFIX}`date`: Finished (all successful)."
