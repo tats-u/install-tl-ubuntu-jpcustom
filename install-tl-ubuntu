@@ -8,7 +8,7 @@
 
 
 # Copyright 2013-2016, Scott Kostyshak
-#                2016, Tats.U.
+#           2015-2016, Tats.U.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -823,6 +823,18 @@ fi
 
 echo "${ECHOPREFIX}running texhash..."
 texhash >&3 2>&1 && echo "${ECHOPREFIX}texhash was successful." || { echo "${WARNINGPREFIX}texhash exited with error." >&2; MAINRET=1; }
+
+# Enables LuaJITLaTeX
+echo "${ECHOPREFIX}enabling LuaJITLaTeX..."
+sed -i -e '/luajitlatex/s/^#! //' `kpsewhich fmtutil.cnf` &&
+    fmtutil-sys --byfmt luajitlatex &&
+    cat > "/opt/texbin/luajitlatex" <<"EOF" &&
+#!/bin/sh
+exec $(echo "$0" | sed "s@[^/]\+\$@luajittex@") --fmt=luajitlatex.fmt $*
+
+EOF
+chmod +x "/opt/texbin/luajitlatex" || { echo "${WARNINGPREFIX}failed to enable LuaJITLaTeX."; MAINRET=1}
+
 
 if [ "${MAINRET}" = "0" ]; then
     echo "${ECHOPREFIX}`date`: Finished (all successful)."
